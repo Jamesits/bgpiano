@@ -106,7 +106,7 @@ func main() {
 						logger.Tracef("lcomm = %v", lcomm)
 
 						// basic protocol design:
-						// GlobalAdmin + LocalData1 used as auth
+						// GlobalAdmin + LocalData1 used as a magic header
 						if lcomm.GlobalAdmin != 205610 {
 							continue
 						}
