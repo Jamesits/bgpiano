@@ -44,15 +44,27 @@ func main() {
 	})
 	exception.HardFailWithReason("unable to start BGP socket", err)
 
-	// monitor the change of the peer state
+	// monitor peer events
 	err = s.WatchEvent(context.Background(), &api.WatchEventRequest{
 		Peer: &api.WatchEventRequest_Peer{},
 	}, func(r *api.WatchEventResponse) {
-		if p := r.GetPeer(); p != nil && p.Type == api.WatchEventResponse_PeerEvent_STATE {
-			log.Info(p)
-		}
+		log.Info(r)
+
+		//if p := r.GetPeer(); p != nil && p.Type == api.WatchEventResponse_PeerEvent_STATE {
+		//	log.Info(p)
+		//}
 	})
-	exception.HardFailWithReason("unable to create event listener", err)
+	exception.HardFailWithReason("unable to create peer event listener", err)
+
+	// monitor route events
+	err = s.WatchEvent(context.Background(), &api.WatchEventRequest{
+		Table: &api.WatchEventRequest_Table{
+			Filters: []*api.WatchEventRequest_Table_Filter{{}},
+		},
+	}, func(r *api.WatchEventResponse) {
+		log.Info(r)
+	})
+	exception.HardFailWithReason("unable to create table event listener", err)
 
 	// neighbor configuration
 	n := &api.Peer{
@@ -74,6 +86,9 @@ func main() {
 
 	sl := lifecycle.NewSleepLock()
 	lifecycle.WaitForKeyboardInterruptAsync(func() (exitCode int) {
+		err = s.StopBgp(context.Background(), &api.StopBgpRequest{})
+		exception.HardFailWithReason("unable to stop BGP server", err)
+
 		sl.Unlock()
 		return 0
 	})
