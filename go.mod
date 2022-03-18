@@ -3,6 +3,7 @@ module github.com/jamesits/bgpiano
 go 1.16
 
 require (
+	github.com/golang/protobuf v1.5.2
 	github.com/jamesits/libiferr v0.0.0-20220318123535-3fb8868213ac
 	github.com/mattn/go-colorable v0.0.9
 	github.com/osrg/gobgp/v3 v3.0.0

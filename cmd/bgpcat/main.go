@@ -2,6 +2,8 @@ package main
 
 import (
 	"context"
+	"github.com/jamesits/bgpiano/pkg/gobgp_logrus_logger"
+	"github.com/jamesits/bgpiano/pkg/gobgp_utils"
 	"github.com/jamesits/libiferr/exception"
 	"github.com/jamesits/libiferr/lifecycle"
 	"github.com/mattn/go-colorable"
@@ -17,24 +19,24 @@ var logger = logrus.New()
 func printTableSummary() {
 	var err error
 
-	//err = s.ListPath(context.Background(), &api.ListPathRequest{Family: v4Family}, func(p *api.Destination) {
+	//err = s.ListPath(context.Background(), &api.ListPathRequest{Family: V4Family}, func(p *api.Destination) {
 	//	logger.Warn(p)
 	//})
 	//exception.HardFailWithReason("unable to list v4 routes", err)
 	//
-	//err = s.ListPath(context.Background(), &api.ListPathRequest{Family: v6Family}, func(p *api.Destination) {
+	//err = s.ListPath(context.Background(), &api.ListPathRequest{Family: V6Family}, func(p *api.Destination) {
 	//	logger.Warn(p)
 	//})
 	//exception.HardFailWithReason("unable to list v6 routes", err)
 
 	table4, err := s.GetTable(context.Background(), &api.GetTableRequest{
-		Family: v4Family,
+		Family: gobgp_utils.V4Family,
 	})
 	exception.HardFailWithReason("unable to count v6 routes", err)
 	logger.Warnf("v4 path=%d, dst=%d, accepted=%d", table4.GetNumPath(), table4.GetNumDestination(), table4.GetNumAccepted())
 
 	table6, err := s.GetTable(context.Background(), &api.GetTableRequest{
-		Family: v6Family,
+		Family: gobgp_utils.V6Family,
 	})
 	exception.HardFailWithReason("unable to count v6 routes", err)
 	logger.Warnf("v6 path=%d, dst=%d, accepted=%d", table6.GetNumPath(), table6.GetNumDestination(), table6.GetNumAccepted())
@@ -51,7 +53,7 @@ func main() {
 	logger.SetLevel(logrus.InfoLevel)
 	//logger.SetReportCaller(true)
 
-	s = server.NewBgpServer(server.LoggerOption(&logrusLogger{logger: logger}))
+	s = server.NewBgpServer(server.LoggerOption(&gobgp_logrus_logger.GobgpLogrusLogger{Logger: logger}))
 	go s.Serve()
 
 	// global configuration
@@ -69,10 +71,6 @@ func main() {
 		Peer: &api.WatchEventRequest_Peer{},
 	}, func(r *api.WatchEventResponse) {
 		logger.Info(r)
-
-		//if p := r.GetPeer(); p != nil && p.Type == api.WatchEventResponse_PeerEvent_STATE {
-		//	logger.Info(p)
-		//}
 	})
 	exception.HardFailWithReason("unable to create peer event listener", err)
 
@@ -101,10 +99,10 @@ func main() {
 			},
 			AfiSafis: []*api.AfiSafi{
 				{
-					Config: &api.AfiSafiConfig{Family: v4Family},
+					Config: &api.AfiSafiConfig{Family: gobgp_utils.V4Family},
 				},
 				{
-					Config: &api.AfiSafiConfig{Family: v6Family},
+					Config: &api.AfiSafiConfig{Family: gobgp_utils.V6Family},
 				},
 			},
 		},

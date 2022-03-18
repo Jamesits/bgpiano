@@ -2,13 +2,13 @@ package main
 
 import (
 	"fmt"
+	"github.com/jamesits/bgpiano/pkg/midi_drivers"
 	"github.com/jamesits/libiferr/exception"
 	"github.com/jamesits/libiferr/lifecycle"
 	"gitlab.com/gomidi/midi"
 	"gitlab.com/gomidi/midi/reader"
 
 	flag "github.com/spf13/pflag"
-	driver "gitlab.com/gomidi/rtmididrv"
 )
 
 var inputChannel int
@@ -19,18 +19,18 @@ func init() {
 }
 
 func main() {
-	drv, err := driver.New()
+	drv, err := midi_drivers.NewDriver(midi_drivers.RTMIDI)
 	exception.HardFailWithReason("failed to open MIDI driver", err)
-	defer drv.Close()
+	defer drv.(midi.Driver).Close()
 
-	ins, err := drv.Ins()
+	ins, err := drv.(midi.Driver).Ins()
 	exception.HardFailWithReason("unable to enumerate input ports", err)
 	fmt.Println("Input ports: ")
 	for _, value := range ins {
 		fmt.Printf("#%d: %s\n", value.Number(), value.String())
 	}
 
-	outs, err := drv.Outs()
+	outs, err := drv.(midi.Driver).Outs()
 	exception.HardFailWithReason("unable to enumerate output ports", err)
 	fmt.Println("Output ports: ")
 	for _, value := range outs {
