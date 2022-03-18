@@ -7,8 +7,16 @@ import (
 	"gitlab.com/gomidi/midi"
 	"gitlab.com/gomidi/midi/reader"
 
+	flag "github.com/spf13/pflag"
 	driver "gitlab.com/gomidi/rtmididrv"
 )
+
+var inputChannel int
+
+func init() {
+	flag.IntVar(&inputChannel, "input", 0, "input channel")
+	flag.Parse()
+}
 
 func main() {
 	drv, err := driver.New()
@@ -31,7 +39,7 @@ func main() {
 
 	fmt.Println("Messages: ")
 
-	in := ins[0]
+	in := ins[inputChannel]
 	exception.HardFailWithReason("unable to open input port", in.Open())
 	defer in.Close()
 
