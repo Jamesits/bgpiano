@@ -11,4 +11,5 @@ require (
 	github.com/spf13/pflag v1.0.5
 	gitlab.com/gomidi/midi v1.23.7
 	gitlab.com/gomidi/rtmididrv v0.14.0
+	google.golang.org/protobuf v1.27.1
 )

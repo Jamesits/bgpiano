@@ -2,6 +2,7 @@
   <configuration default="false" name="midicat" type="GoApplicationRunConfiguration" factoryName="Go Application">
     <module name="bgpiano" />
     <working_directory value="$PROJECT_DIR$" />
+    <go_parameters value="-trimpath" />
     <useCustomBuildTags value="true" />
     <kind value="PACKAGE" />
     <package value="github.com/jamesits/bgpiano/cmd/midicat" />

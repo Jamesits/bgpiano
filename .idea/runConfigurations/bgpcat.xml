@@ -3,6 +3,7 @@
     <module name="bgpiano" />
     <target name="WSL - kali-linux" />
     <working_directory value="$PROJECT_DIR$" />
+    <go_parameters value="-trimpath" />
     <useCustomBuildTags value="true" />
     <kind value="PACKAGE" />
     <package value="github.com/jamesits/bgpiano/cmd/bgpcat" />

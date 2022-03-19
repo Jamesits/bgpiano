@@ -16,32 +16,6 @@ import (
 var s *server.BgpServer
 var logger = logrus.New()
 
-func printTableSummary() {
-	var err error
-
-	//err = s.ListPath(context.Background(), &api.ListPathRequest{Family: V4Family}, func(p *api.Destination) {
-	//	logger.Warn(p)
-	//})
-	//exception.HardFailWithReason("unable to list v4 routes", err)
-	//
-	//err = s.ListPath(context.Background(), &api.ListPathRequest{Family: V6Family}, func(p *api.Destination) {
-	//	logger.Warn(p)
-	//})
-	//exception.HardFailWithReason("unable to list v6 routes", err)
-
-	table4, err := s.GetTable(context.Background(), &api.GetTableRequest{
-		Family: gobgp_utils.V4Family,
-	})
-	exception.HardFailWithReason("unable to count v4 routes", err)
-	logger.Warnf("v4 path=%d, dst=%d, accepted=%d", table4.GetNumPath(), table4.GetNumDestination(), table4.GetNumAccepted())
-
-	table6, err := s.GetTable(context.Background(), &api.GetTableRequest{
-		Family: gobgp_utils.V6Family,
-	})
-	exception.HardFailWithReason("unable to count v6 routes", err)
-	logger.Warnf("v6 path=%d, dst=%d, accepted=%d", table6.GetNumPath(), table6.GetNumDestination(), table6.GetNumAccepted())
-}
-
 func main() {
 	var err error
 	logger.SetFormatter(&logrus.TextFormatter{
@@ -51,7 +25,7 @@ func main() {
 
 	logger.SetOutput(colorable.NewColorableStderr())
 	logger.SetLevel(logrus.InfoLevel)
-	//logger.SetReportCaller(true)
+	logger.SetReportCaller(true)
 
 	s = server.NewBgpServer(server.LoggerOption(&gobgp_logrus_logger.GobgpLogrusLogger{Logger: logger}))
 	go s.Serve()
@@ -66,28 +40,26 @@ func main() {
 	})
 	exception.HardFailWithReason("unable to start BGP socket", err)
 
-	// monitor peer events
+	// monitor events
 	err = s.WatchEvent(context.Background(), &api.WatchEventRequest{
 		Peer: &api.WatchEventRequest_Peer{},
-	}, func(r *api.WatchEventResponse) {
-		logger.Info(r)
-	})
-	exception.HardFailWithReason("unable to create peer event listener", err)
-
-	// monitor route events
-	err = s.WatchEvent(context.Background(), &api.WatchEventRequest{
 		Table: &api.WatchEventRequest_Table{
-			Filters: []*api.WatchEventRequest_Table_Filter{{}},
+			Filters: []*api.WatchEventRequest_Table_Filter{
+				{
+					Type: api.WatchEventRequest_Table_Filter_ADJIN,
+				},
+			},
 		},
 	}, func(r *api.WatchEventResponse) {
-		logger.Info(r)
+		//logger.Info(r)
+		processEvent(r)
 	})
-	exception.HardFailWithReason("unable to create table event listener", err)
+	exception.HardFailWithReason("unable to create peer event listener", err)
 
 	// monitor table statistics
 	go func() {
 		for range time.Tick(time.Second * 10) {
-			printTableSummary()
+			gobgp_utils.PrintTableSummary(s, logger)
 		}
 	}()
 
@@ -123,8 +95,6 @@ func main() {
 
 	sl := lifecycle.NewSleepLock()
 	lifecycle.WaitForKeyboardInterruptAsync(func() (exitCode int) {
-		printTableSummary()
-
 		err = s.StopBgp(context.Background(), &api.StopBgpRequest{})
 		exception.HardFailWithReason("unable to stop BGP server", err)
 
