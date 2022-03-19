@@ -6,7 +6,6 @@ import (
 	"github.com/jamesits/bgpiano/pkg/gobgp_utils"
 	"github.com/jamesits/libiferr/exception"
 	api "github.com/osrg/gobgp/v3/api"
-	"os"
 	"strings"
 )
 
@@ -122,6 +121,9 @@ func processEvent(r *api.WatchEventResponse) {
 				//	}
 				//  extendedInformationStringBuilder.WriteString("\n")
 
+				// seems nobody uses it on the Internet
+				//case "type.googleapis.com/apipb.IP6ExtendedCommunitiesAttribute":
+
 				case "type.googleapis.com/apipb.LargeCommunitiesAttribute":
 					lComms := &api.LargeCommunitiesAttribute{}
 					err = proto.Unmarshal(pAttr.GetValue(), lComms)
@@ -139,10 +141,6 @@ func processEvent(r *api.WatchEventResponse) {
 					exception.SoftFailWithReason("unable to parse aggregator information", err)
 					extendedInformationStringBuilder.WriteString(extensiveDisplayPrefix)
 					extendedInformationStringBuilder.WriteString(fmt.Sprintf("aggregator: %s (%d)\n", aggr.GetAddress(), aggr.GetAsn()))
-
-				case "type.googleapis.com/apipb.IP6ExtendedCommunitiesAttribute":
-					os.Stdout.Sync()
-					panic("IP6ExtendedCommunitiesAttribute")
 
 				default: // goes to detailed display
 					extendedInformationStringBuilder.WriteString(extensiveDisplayPrefix)
