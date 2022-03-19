@@ -25,7 +25,7 @@ func main() {
 
 	logger.SetOutput(colorable.NewColorableStderr())
 	logger.SetLevel(logrus.InfoLevel)
-	logger.SetReportCaller(true)
+	logger.SetReportCaller(false)
 
 	s = server.NewBgpServer(server.LoggerOption(&gobgp_logrus_logger.GobgpLogrusLogger{Logger: logger}))
 	go s.Serve()
@@ -76,6 +76,10 @@ func main() {
 				{
 					Config: &api.AfiSafiConfig{Family: gobgp_utils.V6Family},
 				},
+			},
+			ApplyPolicy: &api.ApplyPolicy{
+				ImportPolicy: gobgp_utils.PolicyAccept,
+				ExportPolicy: gobgp_utils.PolicyReject,
 			},
 		},
 	})

@@ -6,6 +6,7 @@ import (
 	"github.com/jamesits/bgpiano/pkg/gobgp_utils"
 	"github.com/jamesits/libiferr/exception"
 	api "github.com/osrg/gobgp/v3/api"
+	"os"
 	"strings"
 )
 
@@ -99,8 +100,41 @@ func processEvent(r *api.WatchEventResponse) {
 					}
 					attrs.WriteString("\n")
 
-				//case "type.googleapis.com/apipb.LargeCommunitiesAttribute":
+				// too hard to parse
+				//case "type.googleapis.com/apipb.ExtendedCommunitiesAttribute":
+				//	extComms := &api.ExtendedCommunitiesAttribute{}
+				//	err = proto.Unmarshal(pAttr.GetValue(), extComms)
+				//	exception.SoftFailWithReason("unable to parse extended communities", err)
+				//	attrs.WriteString("\t")
+				//	attrs.WriteString("extended community")
+				//	for _, rawExtComm := range extComms.GetCommunities() {
+				//		switch rawExtComm.GetTypeUrl() {
+				//		case "type.googleapis.com/apipb.TwoOctetAsSpecificExtended":
+				//			extCommAttrib := &api.TwoOctetAsSpecificExtended{}
+				//			err = proto.Unmarshal(rawExtComm.GetValue(), extCommAttrib)
+				//			exception.SoftFailWithReason("unable to parse extended communities", err)
+				//
+				//		default:
+				//
+				//		}
+				//	}
+				//  attrs.WriteString("\n")
+
+				case "type.googleapis.com/apipb.LargeCommunitiesAttribute":
+					lComms := &api.LargeCommunitiesAttribute{}
+					err = proto.Unmarshal(pAttr.GetValue(), lComms)
+					exception.SoftFailWithReason("unable to parse large community", err)
+					attrs.WriteString("\tlarge community:")
+					for _, lComm := range lComms.GetCommunities() {
+						attrs.WriteString(fmt.Sprintf(" %d:%d:%d", lComm.GetGlobalAdmin(), lComm.GetLocalData1(), lComm.GetLocalData2()))
+					}
+					attrs.WriteString("\n")
+
 				//case "type.googleapis.com/apipb.AggregatorAttribute":
+
+				case "type.googleapis.com/apipb.IP6ExtendedCommunitiesAttribute":
+					os.Stdout.Sync()
+					panic("IP6ExtendedCommunitiesAttribute")
 
 				default: // goes to detailed display
 					attrs.WriteString("\t")
@@ -135,7 +169,9 @@ func processEvent(r *api.WatchEventResponse) {
 			// flush everything
 			line.WriteString("\n")
 			fmt.Print(line.String())
-			fmt.Print(attrs.String())
+			if extensive {
+				fmt.Print(attrs.String())
+			}
 		}
 
 		return
