@@ -121,9 +121,12 @@ func processEvent(r *api.WatchEventResponse) {
 				for _, asn := range asPathSegment.GetNumbers() {
 					line.WriteString(fmt.Sprintf("%v ", asn))
 				}
-				if origin.GetOrigin() == 0 {
+				switch origin.GetOrigin() {
+				case 0:
 					line.WriteString("i")
-				} else {
+				case 1:
+					line.WriteString("e")
+				default:
 					line.WriteString("?")
 				}
 				line.WriteString("]\t")
