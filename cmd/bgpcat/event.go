@@ -10,6 +10,8 @@ import (
 	"strings"
 )
 
+const extensiveDisplayPrefix = "\t\t"
+
 func processEvent(r *api.WatchEventResponse) {
 	if peer := r.GetPeer(); peer != nil { // peer event
 		logger.Info(peer)
@@ -18,51 +20,51 @@ func processEvent(r *api.WatchEventResponse) {
 	}
 
 	if table := r.GetTable(); table != nil { // table event
-		line := strings.Builder{}
-		attrs := strings.Builder{}
+		basicInformationStringBuilder := strings.Builder{}
+		extendedInformationStringBuilder := strings.Builder{}
 
 		for _, path := range table.GetPaths() {
-			line.Reset()
-			attrs.Reset()
+			basicInformationStringBuilder.Reset()
+			extendedInformationStringBuilder.Reset()
 
 			// write add/withdraw marker
 			if path.GetIsWithdraw() {
-				line.WriteString("-")
+				basicInformationStringBuilder.WriteString("-")
 			} else {
-				line.WriteString("+")
+				basicInformationStringBuilder.WriteString("+")
 			}
 
 			// write internal/external marker
 			if path.GetIsFromExternal() {
-				line.WriteString("e")
+				basicInformationStringBuilder.WriteString("e")
 			} else {
-				line.WriteString("i")
+				basicInformationStringBuilder.WriteString("i")
 			}
 
 			// write nexthop invalid marker
 			if path.GetIsNexthopInvalid() {
-				line.WriteString("x")
+				basicInformationStringBuilder.WriteString("x")
 			} else {
-				line.WriteString(" ")
+				basicInformationStringBuilder.WriteString(" ")
 			}
 
 			// write filtered marker
 			if path.GetFiltered() {
-				line.WriteString("f")
+				basicInformationStringBuilder.WriteString("f")
 			} else {
-				line.WriteString(" ")
+				basicInformationStringBuilder.WriteString(" ")
 			}
 
 			// leftover states:
 			// - validation state
 			// - implicit withdraw
-			line.WriteString("\t")
+			basicInformationStringBuilder.WriteString("\t")
 
 			// NLRI/network
 			networkStr, err := gobgp_utils.NLRIToString(path.GetNlri())
 			exception.SoftFailWithReason("unknown NLRI type", err)
-			line.WriteString(networkStr)
-			line.WriteString("\t")
+			basicInformationStringBuilder.WriteString(networkStr)
+			basicInformationStringBuilder.WriteString("\t")
 
 			// TLV
 			asPath := &api.AsPathAttribute{}
@@ -93,20 +95,20 @@ func processEvent(r *api.WatchEventResponse) {
 					comms := &api.CommunitiesAttribute{}
 					err = proto.Unmarshal(pAttr.GetValue(), comms)
 					exception.SoftFailWithReason("unable to parse communities", err)
-					attrs.WriteString("\t")
-					attrs.WriteString("community:")
+					extendedInformationStringBuilder.WriteString(extensiveDisplayPrefix)
+					extendedInformationStringBuilder.WriteString("community:")
 					for _, comm := range comms.GetCommunities() {
-						attrs.WriteString(fmt.Sprintf(" %d", comm))
+						extendedInformationStringBuilder.WriteString(fmt.Sprintf(" %d", comm))
 					}
-					attrs.WriteString("\n")
+					extendedInformationStringBuilder.WriteString("\n")
 
 				// too hard to parse
 				//case "type.googleapis.com/apipb.ExtendedCommunitiesAttribute":
 				//	extComms := &api.ExtendedCommunitiesAttribute{}
 				//	err = proto.Unmarshal(pAttr.GetValue(), extComms)
 				//	exception.SoftFailWithReason("unable to parse extended communities", err)
-				//	attrs.WriteString("\t")
-				//	attrs.WriteString("extended community")
+				//  extendedInformationStringBuilder.WriteString(extensiveDisplayPrefix)
+				//	extendedInformationStringBuilder.WriteString("extended community")
 				//	for _, rawExtComm := range extComms.GetCommunities() {
 				//		switch rawExtComm.GetTypeUrl() {
 				//		case "type.googleapis.com/apipb.TwoOctetAsSpecificExtended":
@@ -118,59 +120,65 @@ func processEvent(r *api.WatchEventResponse) {
 				//
 				//		}
 				//	}
-				//  attrs.WriteString("\n")
+				//  extendedInformationStringBuilder.WriteString("\n")
 
 				case "type.googleapis.com/apipb.LargeCommunitiesAttribute":
 					lComms := &api.LargeCommunitiesAttribute{}
 					err = proto.Unmarshal(pAttr.GetValue(), lComms)
 					exception.SoftFailWithReason("unable to parse large community", err)
-					attrs.WriteString("\tlarge community:")
+					extendedInformationStringBuilder.WriteString(extensiveDisplayPrefix)
+					extendedInformationStringBuilder.WriteString("large community:")
 					for _, lComm := range lComms.GetCommunities() {
-						attrs.WriteString(fmt.Sprintf(" %d:%d:%d", lComm.GetGlobalAdmin(), lComm.GetLocalData1(), lComm.GetLocalData2()))
+						extendedInformationStringBuilder.WriteString(fmt.Sprintf(" %d:%d:%d", lComm.GetGlobalAdmin(), lComm.GetLocalData1(), lComm.GetLocalData2()))
 					}
-					attrs.WriteString("\n")
+					extendedInformationStringBuilder.WriteString("\n")
 
-				//case "type.googleapis.com/apipb.AggregatorAttribute":
+				case "type.googleapis.com/apipb.AggregatorAttribute":
+					aggr := &api.AggregatorAttribute{}
+					err = proto.Unmarshal(pAttr.GetValue(), aggr)
+					exception.SoftFailWithReason("unable to parse aggregator information", err)
+					extendedInformationStringBuilder.WriteString(extensiveDisplayPrefix)
+					extendedInformationStringBuilder.WriteString(fmt.Sprintf("aggregator: %s (%d)\n", aggr.GetAddress(), aggr.GetAsn()))
 
 				case "type.googleapis.com/apipb.IP6ExtendedCommunitiesAttribute":
 					os.Stdout.Sync()
 					panic("IP6ExtendedCommunitiesAttribute")
 
 				default: // goes to detailed display
-					attrs.WriteString("\t")
-					attrs.WriteString(pAttr.String())
-					attrs.WriteString("\n")
+					extendedInformationStringBuilder.WriteString(extensiveDisplayPrefix)
+					extendedInformationStringBuilder.WriteString(pAttr.String())
+					extendedInformationStringBuilder.WriteString("\n")
 				}
 			}
 
 			// NLRI
 			// a basic assumption is that Next Hop and NLRI does not appear in the same route
-			line.WriteString("[")
-			line.WriteString(nextHop.GetNextHop())
-			line.WriteString(strings.Join(nlris.GetNextHops(), ", "))
-			line.WriteString("]\t")
+			basicInformationStringBuilder.WriteString("[")
+			basicInformationStringBuilder.WriteString(nextHop.GetNextHop())
+			basicInformationStringBuilder.WriteString(strings.Join(nlris.GetNextHops(), ", "))
+			basicInformationStringBuilder.WriteString("]\t")
 
 			for _, asPathSegment := range asPath.GetSegments() {
-				line.WriteString("[")
+				basicInformationStringBuilder.WriteString("[")
 				for _, asn := range asPathSegment.GetNumbers() {
-					line.WriteString(fmt.Sprintf("%v ", asn))
+					basicInformationStringBuilder.WriteString(fmt.Sprintf("%v ", asn))
 				}
 				switch origin.GetOrigin() {
 				case 0:
-					line.WriteString("i")
+					basicInformationStringBuilder.WriteString("i")
 				case 1:
-					line.WriteString("e")
+					basicInformationStringBuilder.WriteString("e")
 				default:
-					line.WriteString("?")
+					basicInformationStringBuilder.WriteString("?")
 				}
-				line.WriteString("]\t")
+				basicInformationStringBuilder.WriteString("]\t")
 			}
 
 			// flush everything
-			line.WriteString("\n")
-			fmt.Print(line.String())
+			basicInformationStringBuilder.WriteString("\n")
+			fmt.Print(basicInformationStringBuilder.String())
 			if extensive {
-				fmt.Print(attrs.String())
+				fmt.Print(extendedInformationStringBuilder.String())
 			}
 		}
 
