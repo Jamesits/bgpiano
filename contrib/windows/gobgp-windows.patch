@@ -1,0 +1,28 @@
+diff --git a/pkg/server/util.go b/pkg/server/util.go
+index 1ca64fc4..dfeced2b 100644
+--- a/pkg/server/util.go
++++ b/pkg/server/util.go
+@@ -74,21 +74,13 @@ func extractFamilyFromTCPConn(conn *net.TCPConn) int {
+ }
+ 
+ func setsockOptString(sc syscall.RawConn, level int, opt int, str string) error {
+-	var opterr error
+-	fn := func(s uintptr) {
+-		opterr = syscall.SetsockoptString(int(s), level, opt, str)
+-	}
+-	err := sc.Control(fn)
+-	if opterr == nil {
+-		return err
+-	}
+-	return opterr
++	return nil
+ }
+ 
+ func setsockOptInt(sc syscall.RawConn, level, name, value int) error {
+ 	var opterr error
+ 	fn := func(s uintptr) {
+-		opterr = syscall.SetsockoptInt(int(s), level, name, value)
++		opterr = syscall.SetsockoptInt(syscall.Handle(s), level, name, value)
+ 	}
+ 	err := sc.Control(fn)
+ 	if opterr == nil {

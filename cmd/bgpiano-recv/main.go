@@ -133,6 +133,8 @@ func main() {
 	})
 	exception.HardFailWithReason("unable to create table event listener", err)
 
+	go printStatTimerSync()
+
 	err = s.AddPeerGroup(context.Background(), &api.AddPeerGroupRequest{
 		PeerGroup: &api.PeerGroup{
 			Conf: &api.PeerGroupConf{PeerGroupName: "default"},

@@ -32,7 +32,7 @@ func printTableSummary() {
 	table4, err := s.GetTable(context.Background(), &api.GetTableRequest{
 		Family: gobgp_utils.V4Family,
 	})
-	exception.HardFailWithReason("unable to count v6 routes", err)
+	exception.HardFailWithReason("unable to count v4 routes", err)
 	logger.Warnf("v4 path=%d, dst=%d, accepted=%d", table4.GetNumPath(), table4.GetNumDestination(), table4.GetNumAccepted())
 
 	table6, err := s.GetTable(context.Background(), &api.GetTableRequest{
