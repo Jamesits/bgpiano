@@ -1,0 +1,97 @@
+before:
+  hooks:
+    - "go mod tidy"
+    - "go generate ./..."
+
+env:
+  - "CGO_ENABLED=1"
+
+builds:
+  - &build_template
+    id: "template"
+    skip: true
+    goos:
+      - "linux"
+    goarch:
+      - "amd64"
+    mod_timestamp: "{{ .CommitTimestamp }}"
+    flags:
+      - "-v"
+      - "-trimpath"
+    asmflags:
+      - "all=-trimpath={{ .Env.GOPATH }}"
+    gcflags:
+      - "all=-trimpath={{ .Env.GOPATH }}"
+    ldflags:
+      - "-s"
+      - "-w"
+      - "-X 'github.com/jamesits/bgpiano/internal/pkg/version.Version={{ .Version }}'"
+      - "-X 'github.com/jamesits/bgpiano/internal/pkg/version.CommitId={{ .Commit }}'"
+      - "-X 'github.com/jamesits/bgpiano/internal/pkg/version.Date={{ .Date }}'"
+      - "-X 'github.com/jamesits/bgpiano/internal/pkg/version.BuiltBy=goreleaser'"
+    tags:
+      - "libiferr.logrus"
+  - <<: *build_template
+    id: "bgpcat"
+    main: "./cmd/bgpcat"
+    binary: "bgpcat"
+    skip: false
+  - <<: *build_template
+    id: "midicat"
+    main: "./cmd/midicat"
+    binary: "midicat"
+    skip: false
+
+archives:
+  - id: "release"
+    format: "tar.xz"
+    wrap_in_directory: true
+    format_overrides:
+      - goos: "windows"
+        format: "zip"
+    replacements:
+      darwin: "macOS"
+      linux: "Linux"
+      windows: "Windows"
+      386: "i386"
+      amd64: "x86_64"
+
+nfpms:
+  - id: "release"
+    package_name: "bgpiano"
+    vendor: "James Swineson"
+    homepage: "https://github.com/jamesits/bgpiano"
+    maintainer: "James Swineson <github@public.swineson.me>"
+    description: |-
+      BGP <-> MIDI
+    license: "GLWTS(Good Luck With That Shit) Public License"
+    formats:
+      - "apk"
+      - "deb"
+      - "rpm"
+
+checksum:
+  name_template: "checksums.txt"
+
+snapshot:
+  name_template: "{{ incpatch .Version }}-next"
+
+changelog:
+  sort: "asc"
+  filters:
+    exclude:
+      - "^doc:"
+      - "^docs:"
+      - "^test:"
+      - "^cleanup:"
+      - "typo"
+      - "readme"
+      - "README"
+      - "comment"
+
+gomod:
+  proxy: true
+  env:
+    - "GOPROXY=https://proxy.golang.org,direct"
+    - "GOSUMDB=sum.golang.org"
+    - "GOPRIVATE=github.com/jamesits/bgpiano"
