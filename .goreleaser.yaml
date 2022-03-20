@@ -34,14 +34,21 @@ builds:
     gcflags:
       - "all=-trimpath={{ .Env.GOPATH }}"
     ldflags:
-      - "-s"
-      - "-w"
-
       # build time string overrides
       - "-X 'github.com/jamesits/bgpiano/internal/pkg/version.Version={{ .Version }}'"
       - "-X 'github.com/jamesits/bgpiano/internal/pkg/version.CommitId={{ .Commit }}'"
       - "-X 'github.com/jamesits/bgpiano/internal/pkg/version.Date={{ .CommitDate }}'"
       - "-X 'github.com/jamesits/bgpiano/internal/pkg/version.BuiltBy=goreleaser'"
+
+      # omit the symbol table and debug information
+      - "-s"
+      # omit the DWARF symbol table
+      - "-w"
+
+      # link with C/C++ address sanitizer support (go 1.18+)
+      - "-asan"
+      # link with C/C++ memory sanitizer support
+      - "-msan"
 
       - "-linkmode=external"
 
@@ -51,7 +58,9 @@ builds:
       # https://stackoverflow.com/a/61554975
       # - "-extldflags '-static-pie'"
       # - "-extldflags '-static'"
-      - "-extldflags '-static-libgcc -static-libstdc++'"
+
+      # if static libstdc++ and libgcc is needed: (can safely enable)
+      # - "-extldflags '-static-libgcc -static-libstdc++'"
     tags:
       - "cgo"
       - "osusergo"
