@@ -6,6 +6,9 @@ BGP message <-> MIDI message, for times when you want to broadcast your music in
 
 ### Point to Point
 
+The GoBGP library we use does not support customizing peer TCP port. Thus, you are stuck with port 179 and would
+(in most cases) need root privilege to listen on that port.
+
 Instrument (MIDI sender) side:
 
 ```shell
