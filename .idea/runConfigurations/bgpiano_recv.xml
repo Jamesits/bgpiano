@@ -4,6 +4,7 @@
     <working_directory value="$PROJECT_DIR$" />
     <go_parameters value="-trimpath" />
     <useCustomBuildTags value="true" />
+    <parameters value="--debug --bgp-peer-ip=192.168.47.228 --bgp-peer-asn=65001" />
     <kind value="PACKAGE" />
     <package value="github.com/jamesits/bgpiano/cmd/bgpiano-recv" />
     <directory value="$PROJECT_DIR$" />

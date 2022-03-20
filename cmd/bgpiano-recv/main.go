@@ -5,6 +5,7 @@ import (
 	"github.com/jamesits/bgpiano/pkg/gobgp_logrus_logger"
 	"github.com/jamesits/bgpiano/pkg/gobgp_utils"
 	"github.com/jamesits/bgpiano/pkg/midi_drivers"
+	"github.com/jamesits/bgpiano/pkg/nic"
 	"github.com/jamesits/libiferr/exception"
 	"github.com/jamesits/libiferr/lifecycle"
 	"github.com/mattn/go-colorable"
@@ -27,8 +28,14 @@ func main() {
 	})
 
 	logger.SetOutput(colorable.NewColorableStderr())
-	logger.SetLevel(logrus.InfoLevel)
-	logger.SetReportCaller(true)
+
+	if debug {
+		logger.SetLevel(logrus.TraceLevel)
+		logger.SetReportCaller(true)
+	} else {
+		logger.SetLevel(logrus.InfoLevel)
+		logger.SetReportCaller(false)
+	}
 
 	// MIDI driver init
 	midiDriverType := midi_drivers.RTMIDI
@@ -55,9 +62,10 @@ func main() {
 	// global configuration
 	err = s.StartBgp(context.Background(), &api.StartBgpRequest{
 		Global: &api.Global{
-			Asn:        asn,
-			RouterId:   routerId,
-			ListenPort: listenPort,
+			Asn:             asn,
+			RouterId:        routerId,
+			ListenPort:      listenPort,
+			ListenAddresses: []string{"0.0.0.0", "::"},
 		},
 	})
 	exception.HardFailWithReason("unable to start BGP socket", err)
@@ -158,16 +166,36 @@ func main() {
 	exception.HardFailWithReason("unable to add BGP peer group", err)
 
 	// neighbor configuration
-	err = s.AddPeer(context.Background(), &api.AddPeerRequest{
-		Peer: &api.Peer{
-			Conf: &api.PeerConf{
-				NeighborAddress: peerIp,
-				PeerAsn:         peerAsn,
-				PeerGroup:       "default",
+	if peerIp != "" {
+		err = s.AddPeer(context.Background(), &api.AddPeerRequest{
+			Peer: &api.Peer{
+				Conf: &api.PeerConf{
+					NeighborAddress: peerIp,
+					PeerAsn:         peerAsn,
+					PeerGroup:       "default",
+				},
 			},
-		},
-	})
-	exception.HardFailWithReason("unable to add BGP peer", err)
+		})
+		exception.HardFailWithReason("unable to add BGP peer", err)
+
+	} else { // unnumbered BGP (experimental)
+		logger.Infoln("unnumbered BGP enabled")
+
+		adapters, err := nic.GetAdapterNames()
+		exception.HardFailWithReason("unable to list NICs", err)
+
+		for _, adapter := range adapters {
+			err = s.AddPeer(context.Background(), &api.AddPeerRequest{
+				Peer: &api.Peer{
+					Conf: &api.PeerConf{
+						NeighborInterface: adapter,
+						PeerGroup:         "default",
+					},
+				},
+			})
+			exception.SoftFailWithContext(logrus.WithField("nic", adapter), "unable to add BGP peer on interface", err)
+		}
+	}
 
 	sl := lifecycle.NewSleepLock()
 	lifecycle.WaitForKeyboardInterruptAsync(func() (exitCode int) {

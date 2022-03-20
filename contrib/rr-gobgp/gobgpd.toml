@@ -1,0 +1,21 @@
+# usage: sudo gobgpd --config-file=contrib/rr-gobgp/gobgpd.toml
+
+[global.config]
+  as = 65001
+  router-id = "10.114.51.4"
+
+[[peer-groups]]
+  [peer-groups.config]
+    peer-group-name = "default"
+    peer-as = 65001
+  [[peer-groups.afi-safis]]
+    [peer-groups.afi-safis.config]
+      afi-safi-name = "ipv4-unicast"
+  [[peer-groups.afi-safis]]
+    [peer-groups.afi-safis.config]
+      afi-safi-name = "ipv6-unicast"
+
+[[dynamic-neighbors]]
+  [dynamic-neighbors.config]
+    prefix = "0.0.0.0/0"
+    peer-group = "default"
