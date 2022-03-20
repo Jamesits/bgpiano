@@ -32,4 +32,4 @@ method:
 1. Clone `https://github.com/osrg/gobgp.git` somewhere outside this directory
 2. Apply `contrib\windows\gobgp-windows.patch` to the GoBGP source directory
 3. Append `replace github.com/osrg/gobgp/v3 => ../relative/path/to/gobgp` to `go.mod` in BGPiano project directory
-4. Build
+4. Build the application you need with `go build ./cmd/<executable_name>`

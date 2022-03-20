@@ -174,7 +174,7 @@ func main() {
 		err = s.StopBgp(context.Background(), &api.StopBgpRequest{})
 		exception.HardFailWithReason("unable to stop BGP server", err)
 
-		sl.Unlock()
+		sl.UnlockFromRemote()
 		return 0
 	})
 	sl.LockLocal()

@@ -55,7 +55,7 @@ func main() {
 
 	sl := lifecycle.NewSleepLock()
 	lifecycle.WaitForKeyboardInterruptAsync(func() (exitCode int) {
-		sl.Unlock()
+		sl.UnlockFromRemote()
 		return 0
 	})
 	sl.LockLocal()
