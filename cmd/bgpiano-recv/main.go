@@ -14,10 +14,10 @@ import (
 	"github.com/sirupsen/logrus"
 	"gitlab.com/gomidi/midi"
 	"gitlab.com/gomidi/midi/writer"
-	"google.golang.org/protobuf/proto"
 )
 
 var s *server.BgpServer
+var midiWriter *writer.Writer
 var logger = logrus.New()
 
 func main() {
@@ -53,7 +53,7 @@ func main() {
 	exception.HardFailWithReason("unable to open output port", midiOut.Open())
 	defer midiOut.Close()
 	logger.Infof("MIDI output selected: #%d: %s\n", midiOut.Number(), midiOut.String())
-	midiWriter := writer.New(midiOut)
+	midiWriter = writer.New(midiOut)
 
 	// BGP server init
 	s = server.NewBgpServer(server.LoggerOption(&gobgp_logrus_logger.GobgpLogrusLogger{Logger: logger}))
@@ -87,58 +87,7 @@ func main() {
 				Type: api.WatchEventRequest_Table_Filter_ADJIN,
 			}},
 		},
-	}, func(r *api.WatchEventResponse) {
-		table := r.GetTable()
-		if table == nil {
-			return
-		}
-
-		for _, path := range table.GetPaths() {
-			nlri := path.GetNlri()
-			if nlri.GetTypeUrl() != "type.googleapis.com/apipb.IPAddressPrefix" {
-				logger.Warnf("unknown NLRI: %s %v", nlri.GetTypeUrl(), path)
-				continue
-			}
-			dst := &api.IPAddressPrefix{}
-			err = proto.Unmarshal(nlri.GetValue(), dst)
-			exception.HardFailWithReason("unable to cast api.IPAddressPrefix", err)
-			logger.Tracef("withdraw = %v, dst = %v", path.GetIsWithdraw(), dst)
-
-			for _, pattr := range path.GetPattrs() {
-				if pattr.GetTypeUrl() == "type.googleapis.com/apipb.LargeCommunitiesAttribute" {
-					lcomms := &api.LargeCommunitiesAttribute{}
-					err = proto.Unmarshal(pattr.GetValue(), lcomms)
-					exception.HardFailWithReason("unable to cast api.LargeCommunitiesAttribute", err)
-
-					for _, lcomm := range lcomms.GetCommunities() {
-						logger.Tracef("lcomm = %v", lcomm)
-
-						// basic protocol design:
-						// GlobalAdmin + LocalData1 used as a magic header
-						if lcomm.GlobalAdmin != 205610 {
-							continue
-						}
-
-						switch lcomm.LocalData1 {
-						case 114514:
-							var key = uint8(lcomm.LocalData2 >> 8)
-							var velocity = uint8(lcomm.LocalData2)
-
-							if path.GetIsWithdraw() {
-								logger.Infof("noteOff: %d", key)
-								err = writer.NoteOff(midiWriter, key)
-							} else {
-								logger.Infof("noteOn: %d %d", key, velocity)
-								err = writer.NoteOn(midiWriter, key, velocity)
-							}
-
-							exception.HardFailWithReason("failed to write to output channel", err)
-						}
-					}
-				}
-			}
-		}
-	})
+	}, bgpEventHandler)
 	exception.HardFailWithReason("unable to create table event listener", err)
 
 	go printStatTimerSync()

@@ -23,7 +23,7 @@ func init() {
 	flag.Uint32Var(&peerAsn, "bgp-peer-asn", 0, "peer ASN")
 
 	flag.BoolVar(&useDummyMidiDriver, "midi-dummy", false, "use dummy MIDI driver (debugging only)")
-	flag.IntVar(&midiOutputChannel, "midi-output", 0, "output channel")
+	flag.IntVar(&midiOutputChannel, "midi-output", 0, "output Channel")
 
 	flag.BoolVar(&debug, "debug", false, "enable debug output")
 

@@ -4,13 +4,47 @@ BGP message <-> MIDI message, for times when you want to broadcast your music in
 
 ## Usage
 
-WIP.
+### Point to Point
+
+Instrument (MIDI sender) side:
+
+```shell
+sudo bgpiano-send --bgp-port=179 --bgp-peer-ip=<peer-ip>
+```
+
+Synthesizer (MIDI receiver) side:
+
+```shell
+sudo bgpiano-recv --bgp-port=179 --bgp-peer-ip=<peer-ip>
+```
+
+### Reflected
+
+Reflector side: `gobgp` or equivalent software required. Any RFC-compliant BGP daemon configured as an RR or RS can be
+used.
+
+```shell
+sudo gobgpd --log-plain --config-file=contrib/rr-gobgp/gobgpd.toml
+```
+
+Instrument (MIDI sender) side:
+
+```shell
+bgpiano-send --bgp-peer-ip=<reflector-ip>
+```
+
+Synthesizer (MIDI receiver) side:
+
+```shell
+bgpiano-recv --bgp-peer-ip=<reflector-ip>
+```
 
 ## Building
 
 ## Linux
 
 Requirements:
+
 - `$GOPATH` environment variable is set
 - `$GOBIN` is in `$PATH`
 - GCC is installed (for CGO)

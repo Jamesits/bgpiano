@@ -105,40 +105,76 @@ func main() {
 		Origin: 0,
 	})
 
-	communities0, _ := anypb.New(&api.CommunitiesAttribute{
-		Communities: []uint32{100, 200},
+	//communities0, _ := anypb.New(&api.CommunitiesAttribute{
+	//	Communities: []uint32{100, 200},
+	//})
+
+	//largeCommunities0, _ := anypb.New(&api.LargeCommunitiesAttribute{Communities: []*api.LargeCommunity{
+	//	{
+	//		GlobalAdmin: 205610,
+	//		LocalData1:  114514,
+	//		LocalData2:  0x3c71,
+	//	},
+	//}})
+
+	v6NLRI, _ := anypb.New(&api.IPAddressPrefix{
+		PrefixLen: 64,
+		Prefix:    "2001:db8:1::",
 	})
 
-	largeCommunities0, _ := anypb.New(&api.LargeCommunitiesAttribute{Communities: []*api.LargeCommunity{
-		{
-			GlobalAdmin: 205610,
-			LocalData1:  114514,
-			LocalData2:  0x3c71,
-		},
-	}})
+	v6Attrs, _ := anypb.New(&api.MpReachNLRIAttribute{
+		Family:   gobgp_utils.V6Family,
+		NextHops: []string{"2001:db8::1"},
+		Nlris:    []*anypb.Any{v6NLRI},
+	})
+
+	// IPv4 route example
+	//{
+	//	v6NLRI, _ := anypb.New(&api.IPAddressPrefix{
+	//		Prefix:    "10.0.0.0",
+	//		PrefixLen: 24,
+	//	})
+	//
+	//	a1, _ := anypb.New(&api.OriginAttribute{
+	//		Origin: 0,
+	//	})
+	//	a2, _ := anypb.New(&api.NextHopAttribute{
+	//		NextHop: "10.0.0.1",
+	//	})
+	//	a3, _ := anypb.New(&api.AsPathAttribute{
+	//		Segments: []*api.AsSegment{
+	//			{
+	//				Type:    2,
+	//				Numbers: []uint32{6762, 39919, 65000, 35753, 65000},
+	//			},
+	//		},
+	//	})
+	//	attrs := []*anypb.Any{a1, a2, a3}
+	//
+	//	_, err := s.AddPath(context.Background(), &api.AddPathRequest{
+	//		Path: &api.Path{
+	//			Family: &api.Family{Afi: api.Family_AFI_IP, Safi: api.Family_SAFI_UNICAST},
+	//			Nlri:   v6NLRI,
+	//			Pattrs: attrs,
+	//		},
+	//	})
+	//	if err != nil {
+	//		logger.Fatal(err)
+	//	}
+	//}
 
 	// set up midi event processing
 	rd := reader.New(
 		//reader.NoLogger(), // masks the logging messages that came with the midi library
 		reader.Each(func(pos *reader.Position, msg midi.Message) {
-			nlri, _ := anypb.New(&api.IPAddressPrefix{
-				PrefixLen: 64,
-				Prefix:    "2001:db8:1::",
-			})
-
-			v6Attrs, _ := anypb.New(&api.MpReachNLRIAttribute{
-				Family:   gobgp_utils.V6Family,
-				NextHops: []string{"2001:db8::1"},
-				Nlris:    []*anypb.Any{nlri},
-			})
-
 			_, err = s.AddPath(context.Background(), &api.AddPathRequest{
 				Path: &api.Path{
 					Family: gobgp_utils.V6Family,
-					Nlri:   nlri,
-					Pattrs: []*anypb.Any{originAttribute0, v6Attrs, communities0, largeCommunities0},
+					Nlri:   v6NLRI,
+					Pattrs: []*anypb.Any{v6Attrs, originAttribute0, NewExtendedCommunityFromRawMidiMessage(msg.Raw())},
 				},
 			})
+			exception.HardFailWithReason("unable to add route", err)
 		}),
 	)
 	err = rd.ListenTo(midiIn)
