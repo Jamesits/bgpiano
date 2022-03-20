@@ -123,6 +123,8 @@ nfpms:
       - "apk"
       - "deb"
       - "rpm"
+    dependencies:
+      - "libasound2"
 
 checksum:
   name_template: "checksums.txt"
