@@ -1,4 +1,5 @@
-# usage: sudo gobgpd --config-file=contrib/rr-gobgp/gobgpd.toml
+# usage: sudo gobgpd --log-plain --config-file=contrib/rr-gobgp/gobgpd.toml
+# monitoring: sudo gobgpd monitor adj-in -a [ipv4|ipv6]
 
 [global.config]
   as = 65001
@@ -8,6 +9,14 @@
   [peer-groups.config]
     peer-group-name = "default"
     peer-as = 65001
+  [peer-groups.route-reflector.config]
+    route-reflector-client = true
+    route-reflector-cluster-id = "10.114.51.4"
+  [peer-groups.route-server.config]
+    route-server-client = true
+  [peer-groups.apply-policy.config]
+    default-import-policy = "accept-route"
+    default-export-policy = "accept-route"
   [[peer-groups.afi-safis]]
     [peer-groups.afi-safis.config]
       afi-safi-name = "ipv4-unicast"
