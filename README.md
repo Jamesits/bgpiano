@@ -8,6 +8,22 @@ WIP.
 
 ## Building
 
+## Linux
+
+Requirements:
+- `$GOPATH` environment variable is set
+- `$GOBIN` is in `$PATH`
+- GCC is installed (for CGO)
+- Dependencies: `libasound2-dev`
+
+```shell
+go install github.com/goreleaser/goreleaser@latest
+goreleaser build --snapshot --rm-dist
+```
+
+Notes:
+- Check PIE: `checksec --dir=dist`
+
 ### Windows Support
 
 GoBGP does not support Windows natively. To build this project under Windows with a little hack, use the following

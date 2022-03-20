@@ -4,12 +4,17 @@ before:
     - "go generate ./..."
 
 env:
+  - "GO111MODULE=on"
   - "CGO_ENABLED=1"
+  # reference: https://wiki.archlinux.org/title/Arch_package_guidelines/Security
+  - "CGO_CPPFLAGS=-fstack-protector-strong -fstack-clash-protection -D_GLIBCXX_ASSERTION -D_FORTIFY_SOURCE=2"
+  - "CGO_LDFLAGS=-Wl,-z,relro,-z,now,-z,defs,-z,noexecstack -fPIC"
 
 builds:
   - &build_template
     id: "template"
     skip: true
+    no_unique_dist_dir: true
     goos:
       - "linux"
     goarch:
@@ -18,6 +23,12 @@ builds:
     flags:
       - "-v"
       - "-trimpath"
+
+      # references:
+      # https://dubo-dubon-duponey.medium.com/a-beginners-guide-to-cross-compiling-static-cgo-pie-binaries-golang-1-16-792eea92d5aa
+      # https://docs.google.com/document/d/1nr-TQHw_er6GOQRsF6T43GGhFDelrAP0NqSS_00RgZQ/
+      # https://rain-1.github.io/golang-aslr.html
+      - "-buildmode=pie"
     asmflags:
       - "all=-trimpath={{ .Env.GOPATH }}"
     gcflags:
@@ -25,21 +36,55 @@ builds:
     ldflags:
       - "-s"
       - "-w"
+
+      # build time string overrides
       - "-X 'github.com/jamesits/bgpiano/internal/pkg/version.Version={{ .Version }}'"
       - "-X 'github.com/jamesits/bgpiano/internal/pkg/version.CommitId={{ .Commit }}'"
-      - "-X 'github.com/jamesits/bgpiano/internal/pkg/version.Date={{ .Date }}'"
+      - "-X 'github.com/jamesits/bgpiano/internal/pkg/version.Date={{ .CommitDate }}'"
       - "-X 'github.com/jamesits/bgpiano/internal/pkg/version.BuiltBy=goreleaser'"
+
+      - "-linkmode=external"
+
+      # cannot enable static linking here, since we still need libasound.so.2
+      # references:
+      # https://github.com/golang/go/issues/26492
+      # https://stackoverflow.com/a/61554975
+      # - "-extldflags '-static-pie'"
+      # - "-extldflags '-static'"
+      - "-extldflags '-static-libgcc -static-libstdc++'"
     tags:
+      - "cgo"
+      - "osusergo"
+
+      # de-facto tag
+      # reference: https://github.com/golang/go/issues/26492
+      - "static"
+      - "static_build"
+
+      # note: enabling netgo disables RELRO, stack canary and fortification
+      # - "netgo"
+
+      # required for libiferr to use logrus as the default logger
       - "libiferr.logrus"
   - <<: *build_template
     id: "bgpcat"
     main: "./cmd/bgpcat"
-    binary: "bgpcat"
+    binary: "{{ .ProjectName }}_{{ .Target }}/bgpcat{{ .Ext }}"
     skip: false
   - <<: *build_template
     id: "midicat"
     main: "./cmd/midicat"
-    binary: "midicat"
+    binary: "{{ .ProjectName }}_{{ .Target }}/midicat{{ .Ext }}"
+    skip: false
+  - <<: *build_template
+    id: "bgpiano-send"
+    main: "./cmd/bgpiano-send"
+    binary: "{{ .ProjectName }}_{{ .Target }}/bgpiano-send{{ .Ext }}"
+    skip: false
+  - <<: *build_template
+    id: "bgpiano-recv"
+    main: "./cmd/bgpiano-recv"
+    binary: "{{ .ProjectName }}_{{ .Target }}/bgpiano-recv{{ .Ext }}"
     skip: false
 
 archives:
@@ -72,6 +117,7 @@ nfpms:
 
 checksum:
   name_template: "checksums.txt"
+  algorithm: "sha256"
 
 snapshot:
   name_template: "{{ incpatch .Version }}-next"
@@ -84,6 +130,7 @@ changelog:
       - "^docs:"
       - "^test:"
       - "^cleanup:"
+      - "^ci:"
       - "typo"
       - "readme"
       - "README"
