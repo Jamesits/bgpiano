@@ -2,10 +2,10 @@ package main
 
 import (
 	"fmt"
-	"github.com/golang/protobuf/proto"
 	"github.com/jamesits/bgpiano/pkg/gobgp_utils"
 	"github.com/jamesits/libiferr/exception"
 	api "github.com/osrg/gobgp/v3/api"
+	"google.golang.org/protobuf/proto"
 	"strings"
 )
 

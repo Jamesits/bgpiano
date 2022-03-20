@@ -2,8 +2,8 @@ package gobgp_utils
 
 import (
 	"fmt"
-	"github.com/golang/protobuf/proto"
 	api "github.com/osrg/gobgp/v3/api"
+	"google.golang.org/protobuf/proto"
 	"google.golang.org/protobuf/types/known/anypb"
 )
 

@@ -2,7 +2,6 @@ package main
 
 import (
 	"context"
-	"github.com/golang/protobuf/proto"
 	"github.com/jamesits/bgpiano/pkg/gobgp_logrus_logger"
 	"github.com/jamesits/bgpiano/pkg/gobgp_utils"
 	"github.com/jamesits/bgpiano/pkg/midi_drivers"
@@ -14,6 +13,7 @@ import (
 	"github.com/sirupsen/logrus"
 	"gitlab.com/gomidi/midi"
 	"gitlab.com/gomidi/midi/writer"
+	"google.golang.org/protobuf/proto"
 )
 
 var s *server.BgpServer
