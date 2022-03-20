@@ -6,20 +6,24 @@ before:
 env:
   - "GO111MODULE=on"
   - "CGO_ENABLED=1"
-  # reference: https://wiki.archlinux.org/title/Arch_package_guidelines/Security
-  - "CGO_CPPFLAGS=-fstack-protector-strong -fstack-clash-protection -D_GLIBCXX_ASSERTION -D_FORTIFY_SOURCE=2"
-  - "CGO_LDFLAGS=-Wl,-z,relro,-z,now,-z,defs,-z,noexecstack -fPIC"
 
 builds:
-  - &build_template_linux
-    id: "template_linux"
+  - &build_template_generic
+    id: "template_generic"
     skip: true
     no_unique_dist_dir: true
+    mod_timestamp: "{{ .CommitTimestamp }}"
+  - &build_template_linux
+    <<: *build_template_generic
+    id: "template_linux"
     goos:
       - "linux"
     goarch:
       - "amd64"
-    mod_timestamp: "{{ .CommitTimestamp }}"
+    env:
+      # reference: https://wiki.archlinux.org/title/Arch_package_guidelines/Security
+      - "CGO_CPPFLAGS=-fstack-protector-strong -fstack-clash-protection -D_GLIBCXX_ASSERTION -D_FORTIFY_SOURCE=2"
+      - "CGO_LDFLAGS=-Wl,-z,relro,-z,now,-z,defs,-z,noexecstack -fPIC"
     flags:
       - "-v"
       - "-trimpath"
@@ -75,23 +79,30 @@ builds:
 
       # required for libiferr to use logrus as the default logger
       - "libiferr.logrus"
+
+  # actual build targets
   - <<: *build_template_linux
-    id: "bgpcat"
+    id: "bgpcat_linux"
     main: "./cmd/bgpcat"
     binary: "{{ .ProjectName }}_{{ .Target }}/bgpcat{{ .Ext }}"
     skip: false
   - <<: *build_template_linux
-    id: "midicat"
+    id: "midils_linux"
+    main: "./cmd/midils"
+    binary: "{{ .ProjectName }}_{{ .Target }}/midils{{ .Ext }}"
+    skip: false
+  - <<: *build_template_linux
+    id: "midicat_linux"
     main: "./cmd/midicat"
     binary: "{{ .ProjectName }}_{{ .Target }}/midicat{{ .Ext }}"
     skip: false
   - <<: *build_template_linux
-    id: "bgpiano-send"
+    id: "bgpiano-send_linux"
     main: "./cmd/bgpiano-send"
     binary: "{{ .ProjectName }}_{{ .Target }}/bgpiano-send{{ .Ext }}"
     skip: false
   - <<: *build_template_linux
-    id: "bgpiano-recv"
+    id: "bgpiano-recv_linux"
     main: "./cmd/bgpiano-recv"
     binary: "{{ .ProjectName }}_{{ .Target }}/bgpiano-recv{{ .Ext }}"
     skip: false
