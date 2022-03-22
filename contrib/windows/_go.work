@@ -1,0 +1,8 @@
+go 1.18
+
+use (
+	. // github.com/jamesits/bgpiano
+)
+
+// change the last segment to your actual patched GoBGP git repo location!
+replace github.com/osrg/gobgp/v3 => ../gobgp

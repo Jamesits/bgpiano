@@ -1,6 +1,6 @@
 module github.com/jamesits/bgpiano
 
-go 1.16
+go 1.18
 
 require (
 	github.com/jamesits/libiferr v0.0.0-20220318185358-918bd9502231

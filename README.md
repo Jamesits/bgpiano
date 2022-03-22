@@ -44,6 +44,8 @@ bgpiano-recv --bgp-peer-ip=<reflector-ip>
 
 ## Building
 
+Go 1.18 or higher is required.
+
 ## Linux
 
 Requirements:
@@ -59,14 +61,24 @@ goreleaser build --snapshot --rm-dist
 ```
 
 Notes:
-- Check PIE: `checksec --dir=dist`
 
-### Windows Support
+- Check PIE: `checksec --dir=dist` (should be all green)
 
-GoBGP does not support Windows natively. To build this project under Windows with a little hack, use the following
-method:
+### Windows
 
-1. Clone `https://github.com/osrg/gobgp.git` somewhere outside this directory
-2. Apply `contrib\windows\gobgp-windows.patch` to the GoBGP source directory
-3. Append `replace github.com/osrg/gobgp/v3 => ../relative/path/to/gobgp` to `go.mod` in BGPiano project directory
-4. Build the application you need with `go build ./cmd/<executable_name>`
+GoBGP does not support Windows officially. But don't worry! We understand music production is hard under Linux and you
+might have connected all your instruments to your Windows computer. This project equally supports Windows. (Actually,
+most of the development work is done under Windows.)
+
+The only thing you need is a little hack on the GoBGP library:
+
+```powershell
+cd ..
+git clone https://github.com/osrg/gobgp.git
+cd gobgp
+git apply ..\bgpiano\contrib\windows\gobgp-windows.patch
+cd ..\bgpiano
+cp contrib\windows\_go.work go.work
+```
+
+After this, build the application you need with `go build ./cmd/<executable_name>`.
