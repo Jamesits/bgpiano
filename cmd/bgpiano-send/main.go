@@ -4,10 +4,10 @@ import (
 	"context"
 	"github.com/jamesits/bgpiano/pkg/gobgp_logrus_logger"
 	"github.com/jamesits/bgpiano/pkg/gobgp_utils"
+	"github.com/jamesits/bgpiano/pkg/logging_config"
 	"github.com/jamesits/bgpiano/pkg/midi_drivers"
 	"github.com/jamesits/libiferr/exception"
 	"github.com/jamesits/libiferr/lifecycle"
-	"github.com/mattn/go-colorable"
 	api "github.com/osrg/gobgp/v3/api"
 	"github.com/osrg/gobgp/v3/pkg/server"
 	"github.com/sirupsen/logrus"
@@ -20,20 +20,7 @@ var logger = logrus.New()
 
 func main() {
 	var err error
-	logger.SetFormatter(&logrus.TextFormatter{
-		ForceColors:   true,
-		FullTimestamp: false,
-	})
-
-	logger.SetOutput(colorable.NewColorableStderr())
-
-	if debug {
-		logger.SetLevel(logrus.TraceLevel)
-		logger.SetReportCaller(true)
-	} else {
-		logger.SetLevel(logrus.InfoLevel)
-		logger.SetReportCaller(false)
-	}
+	logging_config.LoggerConfig(logger, debug)
 
 	// MIDI driver init
 	midiDriverType := midi_drivers.RTMIDI

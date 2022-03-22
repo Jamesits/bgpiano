@@ -4,11 +4,11 @@ import (
 	"context"
 	"github.com/jamesits/bgpiano/pkg/gobgp_logrus_logger"
 	"github.com/jamesits/bgpiano/pkg/gobgp_utils"
+	"github.com/jamesits/bgpiano/pkg/logging_config"
 	"github.com/jamesits/bgpiano/pkg/midi_drivers"
 	"github.com/jamesits/bgpiano/pkg/nic"
 	"github.com/jamesits/libiferr/exception"
 	"github.com/jamesits/libiferr/lifecycle"
-	"github.com/mattn/go-colorable"
 	api "github.com/osrg/gobgp/v3/api"
 	"github.com/osrg/gobgp/v3/pkg/server"
 	"github.com/sirupsen/logrus"
@@ -22,20 +22,7 @@ var logger = logrus.New()
 
 func main() {
 	var err error
-	logger.SetFormatter(&logrus.TextFormatter{
-		ForceColors:   true,
-		FullTimestamp: false,
-	})
-
-	logger.SetOutput(colorable.NewColorableStderr())
-
-	if debug {
-		logger.SetLevel(logrus.TraceLevel)
-		logger.SetReportCaller(true)
-	} else {
-		logger.SetLevel(logrus.InfoLevel)
-		logger.SetReportCaller(false)
-	}
+	logging_config.LoggerConfig(logger, debug)
 
 	// MIDI driver init
 	midiDriverType := midi_drivers.RTMIDI
@@ -44,14 +31,18 @@ func main() {
 	}
 	drv, err := midi_drivers.NewDriver(midiDriverType)
 	exception.HardFailWithReason("failed to open MIDI driver", err)
-	defer drv.(midi.Driver).Close()
+	defer func(driver midi.Driver) {
+		_ = driver.Close()
+	}(drv.(midi.Driver))
 
 	outs, err := drv.(midi.Driver).Outs()
 	exception.HardFailWithReason("unable to enumerate output ports", err)
 
 	midiOut := outs[midiOutputChannel]
 	exception.HardFailWithReason("unable to open output port", midiOut.Open())
-	defer midiOut.Close()
+	defer func(midiOut midi.Out) {
+		_ = midiOut.Close()
+	}(midiOut)
 	logger.Infof("MIDI output selected: #%d: %s\n", midiOut.Number(), midiOut.String())
 	midiWriter = writer.New(midiOut)
 

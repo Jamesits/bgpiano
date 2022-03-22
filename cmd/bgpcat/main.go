@@ -4,9 +4,9 @@ import (
 	"context"
 	"github.com/jamesits/bgpiano/pkg/gobgp_logrus_logger"
 	"github.com/jamesits/bgpiano/pkg/gobgp_utils"
+	"github.com/jamesits/bgpiano/pkg/logging_config"
 	"github.com/jamesits/libiferr/exception"
 	"github.com/jamesits/libiferr/lifecycle"
-	"github.com/mattn/go-colorable"
 	api "github.com/osrg/gobgp/v3/api"
 	"github.com/osrg/gobgp/v3/pkg/server"
 	"github.com/sirupsen/logrus"
@@ -18,14 +18,7 @@ var logger = logrus.New()
 
 func main() {
 	var err error
-	logger.SetFormatter(&logrus.TextFormatter{
-		ForceColors:   true,
-		FullTimestamp: false,
-	})
-
-	logger.SetOutput(colorable.NewColorableStderr())
-	logger.SetLevel(logrus.InfoLevel)
-	logger.SetReportCaller(false)
+	logging_config.LoggerConfig(logger, false)
 
 	s = server.NewBgpServer(server.LoggerOption(&gobgp_logrus_logger.GobgpLogrusLogger{Logger: logger}))
 	go s.Serve()
