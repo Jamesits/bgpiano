@@ -1,6 +1,7 @@
 package main
 
 import (
+	"github.com/jamesits/bgpiano/pkg/bgpiano_protocol"
 	api "github.com/osrg/gobgp/v3/api"
 	"google.golang.org/protobuf/types/known/anypb"
 )
@@ -13,7 +14,7 @@ func NewExtendedCommunityFromRawMidiMessage(msg []byte) *anypb.Any {
 	}
 
 	comm, _ := anypb.New(&api.UnknownExtended{
-		Type:  0x88,
+		Type:  bgpiano_protocol.BGPianoExtendedCommunityType,
 		Value: append([]byte{l}, msg[:l]...),
 	})
 	ret, _ := anypb.New(&api.ExtendedCommunitiesAttribute{Communities: []*anypb.Any{comm}})

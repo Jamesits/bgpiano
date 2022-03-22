@@ -6,6 +6,7 @@ before:
 env:
   - "GO111MODULE=on"
   - "CGO_ENABLED=1"
+#  - "GOFLAGS=-workfile=off" # Golang 1.18+
 
 builds:
   - &build_template_generic
@@ -110,7 +111,7 @@ builds:
 archives:
   - id: "release"
     format: "tar.xz"
-    wrap_in_directory: true
+    wrap_in_directory: "true"
     format_overrides:
       - goos: "windows"
         format: "zip"

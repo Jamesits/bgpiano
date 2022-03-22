@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"github.com/jamesits/bgpiano/pkg/bgpiano_protocol"
 	"github.com/jamesits/bgpiano/pkg/midi_messages"
 	"github.com/jamesits/libiferr/exception"
 	api "github.com/osrg/gobgp/v3/api"
@@ -62,7 +63,7 @@ func bgpEventHandler(r *api.WatchEventResponse) {
 					err = proto.Unmarshal(rawExtComm.GetValue(), extComm)
 					exception.HardFailWithReason("unable to cast api.UnknownExtended", err)
 
-					if extComm.GetType() != 0x88 {
+					if extComm.GetType() != bgpiano_protocol.BGPianoExtendedCommunityType {
 						continue
 					}
 
