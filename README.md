@@ -82,3 +82,36 @@ cp contrib\windows\_go.work go.work
 ```
 
 After this, build the application you need with `go build ./cmd/<executable_name>`.
+
+## FAQ
+
+### Why?
+
+There is a trend that Chinese BGP players[^bgp-players] misuse 广播 (*lit.* broadcasting) in the meaning of 宣告 (*lit.*
+announcement). As a terminology fundamentalist and one of the earliest BGP players, I hate this incorrect usage of word
+to the bone. However, this wrong terminology is now widespread, so I decided to fix it the other way around, by
+literally *broadcasting* a piece of music across the Internet, through the BGP RIB.
+
+### How
+
+The MIDI message is encoded in either extended community or large community. See [protocol.md](doc/protocol.md) for
+details.
+
+### Will this add additional pressure to the routers?
+
+Yes, but unless you programmatically play something violent like
+[最終鬼畜妹フランドール・S](https://www.youtube.com/watch?v=ql-Rvn50p-Y), a modern router should handle it pretty easily.
+
+### What's the latency?
+
+For BGP propagation latency across the globe,
+*[The speed of BGP network propagation by Ben Cox](https://blog.benjojo.co.uk/post/speed-of-bgp-network-propagation)*
+already provided an excellent overview.
+
+On the topic of latency deviation, due to how BGP routes are received and updated, there are no guarantee that any
+individual note will arrive on time. [Why not have some Jazz instead?](https://www.youtube.com/watch?v=lpc1lEJ-SRc)
+
+<!-- footnotes -->
+
+[^bgp-players]: slang for public ASN owners who use the ASN only for education, research and
+[zhuangbility](https://www.urbandictionary.com/define.php?term=zhuangbility).

@@ -1,9 +1,5 @@
 # BGPiano Protocol
 
-## Motivation
-
-Because I can.
-
 ## Signaling
 
 ### Note On / Note Off
