@@ -1,6 +1,6 @@
 # BGPiano
 
-BGP message <-> MIDI message, for times when you want to broadcast your music instead of your IP packets.
+MIDI tunneling through BGP, for times when you want to broadcast your music instead of your IP packets.
 
 ## Usage
 
@@ -92,7 +92,7 @@ announcement). As a terminology fundamentalist and one of the earliest BGP playe
 to the bone. However, this wrong terminology is now widespread, so I decided to fix it the other way around, by
 literally *broadcasting* a piece of music across the Internet, through the BGP RIB.
 
-### How
+### How?
 
 The MIDI message is encoded in either extended community or large community. See [protocol.md](doc/protocol.md) for
 details.
