@@ -82,6 +82,10 @@ builds:
     binary: "{{ .ProjectName }}_{{ .Target }}/midicat"
     skip: false
   - <<: *build_template_windows
+    id: "midipipe"
+    main: "./cmd/midipipe"
+    binary: "{{ .ProjectName }}_{{ .Target }}/midipipe"
+  - <<: *build_template_windows
     id: "bgpiano-send"
     main: "./cmd/bgpiano-send"
     binary: "{{ .ProjectName }}_{{ .Target }}/bgpiano-send"

@@ -96,6 +96,11 @@ builds:
     binary: "{{ .ProjectName }}_{{ .Target }}/midicat"
     skip: false
   - <<: *build_template_linux
+    id: "midipipe"
+    main: "./cmd/midipipe"
+    binary: "{{ .ProjectName }}_{{ .Target }}/midipipe"
+    skip: false
+  - <<: *build_template_linux
     id: "bgpiano-send"
     main: "./cmd/bgpiano-send"
     binary: "{{ .ProjectName }}_{{ .Target }}/bgpiano-send"
