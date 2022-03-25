@@ -6,7 +6,6 @@ import (
 	"github.com/jamesits/bgpiano/pkg/gobgp_utils"
 	"github.com/jamesits/bgpiano/pkg/logging_config"
 	"github.com/jamesits/bgpiano/pkg/midi_drivers"
-	"github.com/jamesits/bgpiano/pkg/nic"
 	"github.com/jamesits/libiferr/exception"
 	"github.com/jamesits/libiferr/lifecycle"
 	api "github.com/osrg/gobgp/v3/api"
@@ -121,20 +120,13 @@ func main() {
 	} else { // unnumbered BGP (experimental)
 		logger.Infoln("unnumbered BGP enabled")
 
-		adapters, err := nic.GetAdapterNames()
-		exception.HardFailWithReason("unable to list NICs", err)
-
-		for _, adapter := range adapters {
-			err = s.AddPeer(context.Background(), &api.AddPeerRequest{
-				Peer: &api.Peer{
-					Conf: &api.PeerConf{
-						NeighborInterface: adapter,
-						PeerGroup:         "default",
-					},
-				},
-			})
-			exception.SoftFailWithContext(logrus.WithField("nic", adapter), "unable to add BGP peer on interface", err)
-		}
+		err = s.AddDynamicNeighbor(context.Background(), &api.AddDynamicNeighborRequest{
+			DynamicNeighbor: &api.DynamicNeighbor{
+				Prefix:    "0.0.0.0/0",
+				PeerGroup: "default",
+			},
+		})
+		exception.HardFailWithReason("unable to add unnumbered peer", err)
 	}
 
 	sl := lifecycle.NewSleepLock()
