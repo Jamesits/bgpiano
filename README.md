@@ -57,7 +57,7 @@ Requirements:
 
 ```shell
 go install github.com/goreleaser/goreleaser@latest
-goreleaser build --snapshot --rm-dist
+goreleaser build --single-target --snapshot --rm-dist
 ```
 
 Notes:
