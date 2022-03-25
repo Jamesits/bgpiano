@@ -44,6 +44,12 @@ func (f *distributor) runSync() {
 }
 
 func (f *distributor) Stop() {
+	for _, input := range f.inputs {
+		_ = input.port.Close()
+	}
+	for _, output := range f.outputs {
+		_ = output.port.Close()
+	}
 	close(f.doneChannel)
 	logrus.Info("distributor stopped")
 }
