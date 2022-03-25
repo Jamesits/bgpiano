@@ -1,0 +1,51 @@
+# not working for now
+
+builds:
+
+archives:
+  - id: "release"
+    format: "tar.xz"
+    wrap_in_directory: "true"
+    format_overrides:
+      - goos: "windows"
+        format: "zip"
+    replacements:
+      darwin: "macOS"
+      linux: "Linux"
+      windows: "Windows"
+      386: "i386"
+      amd64: "x86_64"
+
+nfpms:
+  - id: "release"
+    package_name: "bgpiano"
+    vendor: "James Swineson"
+    homepage: "https://github.com/jamesits/bgpiano"
+    maintainer: "James Swineson <github@public.swineson.me>"
+    description: |-
+      BGP <-> MIDI
+    license: "GLWTS(Good Luck With That Shit) Public License"
+    formats:
+      - "apk"
+      - "deb"
+      - "rpm"
+    dependencies:
+      - "libasound2"
+
+checksum:
+  name_template: "checksums.txt"
+  algorithm: "sha256"
+
+changelog:
+  sort: "asc"
+  filters:
+    exclude:
+      - "^doc:"
+      - "^docs:"
+      - "^test:"
+      - "^cleanup:"
+      - "^ci:"
+      - "typo"
+      - "readme"
+      - "README"
+      - "comment"

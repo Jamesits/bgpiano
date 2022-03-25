@@ -57,7 +57,7 @@ Requirements:
 
 ```shell
 go install github.com/goreleaser/goreleaser@latest
-goreleaser build --single-target --snapshot --rm-dist
+goreleaser build --single-target --snapshot --rm-dist -f contrib/goreleaser/goreleaser.linux.yaml
 ```
 
 Notes:
@@ -79,9 +79,10 @@ cd gobgp
 git apply ..\bgpiano\contrib\windows\gobgp-windows.patch
 cd ..\bgpiano
 cp contrib\windows\_go.work go.work
-```
 
-After this, build the application you need with `go build ./cmd/<executable_name>`.
+go install github.com/goreleaser/goreleaser@latest
+goreleaser build --snapshot --rm-dist --single-target -f .\contrib\goreleaser\goreleaser.windows.yaml
+```
 
 ## FAQ
 

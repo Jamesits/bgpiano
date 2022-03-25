@@ -9,14 +9,11 @@ env:
 #  - "GOFLAGS=-workfile=off" # Golang 1.18+
 
 builds:
-  - &build_template_generic
-    id: "template_generic"
+  - &build_template_linux
+    id: "template_linux"
     skip: true
     no_unique_dist_dir: true
     mod_timestamp: "{{ .CommitTimestamp }}"
-  - &build_template_linux
-    <<: *build_template_generic
-    id: "template_linux"
     goos:
       - "linux"
     goarch:
@@ -82,83 +79,35 @@ builds:
       # required for libiferr to use logrus as the default logger
       - "libiferr.logrus"
 
-  # actual build targets
+  # Linux build targets
   - <<: *build_template_linux
-    id: "bgpcat_linux"
+    id: "bgpcat"
     main: "./cmd/bgpcat"
     binary: "{{ .ProjectName }}_{{ .Target }}/bgpcat"
     skip: false
   - <<: *build_template_linux
-    id: "midils_linux"
+    id: "midils"
     main: "./cmd/midils"
     binary: "{{ .ProjectName }}_{{ .Target }}/midils"
     skip: false
   - <<: *build_template_linux
-    id: "midicat_linux"
+    id: "midicat"
     main: "./cmd/midicat"
     binary: "{{ .ProjectName }}_{{ .Target }}/midicat"
     skip: false
   - <<: *build_template_linux
-    id: "bgpiano-send_linux"
+    id: "bgpiano-send"
     main: "./cmd/bgpiano-send"
     binary: "{{ .ProjectName }}_{{ .Target }}/bgpiano-send"
     skip: false
   - <<: *build_template_linux
-    id: "bgpiano-recv_linux"
+    id: "bgpiano-recv"
     main: "./cmd/bgpiano-recv"
     binary: "{{ .ProjectName }}_{{ .Target }}/bgpiano-recv"
     skip: false
 
-archives:
-  - id: "release"
-    format: "tar.xz"
-    wrap_in_directory: "true"
-    format_overrides:
-      - goos: "windows"
-        format: "zip"
-    replacements:
-      darwin: "macOS"
-      linux: "Linux"
-      windows: "Windows"
-      386: "i386"
-      amd64: "x86_64"
-
-nfpms:
-  - id: "release"
-    package_name: "bgpiano"
-    vendor: "James Swineson"
-    homepage: "https://github.com/jamesits/bgpiano"
-    maintainer: "James Swineson <github@public.swineson.me>"
-    description: |-
-      BGP <-> MIDI
-    license: "GLWTS(Good Luck With That Shit) Public License"
-    formats:
-      - "apk"
-      - "deb"
-      - "rpm"
-    dependencies:
-      - "libasound2"
-
-checksum:
-  name_template: "checksums.txt"
-  algorithm: "sha256"
-
 snapshot:
   name_template: "{{ incpatch .Version }}-next"
-
-changelog:
-  sort: "asc"
-  filters:
-    exclude:
-      - "^doc:"
-      - "^docs:"
-      - "^test:"
-      - "^cleanup:"
-      - "^ci:"
-      - "typo"
-      - "readme"
-      - "README"
-      - "comment"
 
 gomod:
   proxy: true
