@@ -91,7 +91,7 @@ builds:
   - <<: *build_template_linux
     id: "midils_linux"
     main: "./cmd/midils"
-    binary: "{{ .ProjectName }}_{{ .Target }}/midils{"
+    binary: "{{ .ProjectName }}_{{ .Target }}/midils"
     skip: false
   - <<: *build_template_linux
     id: "midicat_linux"
