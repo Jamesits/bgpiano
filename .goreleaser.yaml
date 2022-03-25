@@ -86,27 +86,27 @@ builds:
   - <<: *build_template_linux
     id: "bgpcat_linux"
     main: "./cmd/bgpcat"
-    binary: "{{ .ProjectName }}_{{ .Target }}/bgpcat{{ .Ext }}"
+    binary: "{{ .ProjectName }}_{{ .Target }}/bgpcat"
     skip: false
   - <<: *build_template_linux
     id: "midils_linux"
     main: "./cmd/midils"
-    binary: "{{ .ProjectName }}_{{ .Target }}/midils{{ .Ext }}"
+    binary: "{{ .ProjectName }}_{{ .Target }}/midils{"
     skip: false
   - <<: *build_template_linux
     id: "midicat_linux"
     main: "./cmd/midicat"
-    binary: "{{ .ProjectName }}_{{ .Target }}/midicat{{ .Ext }}"
+    binary: "{{ .ProjectName }}_{{ .Target }}/midicat"
     skip: false
   - <<: *build_template_linux
     id: "bgpiano-send_linux"
     main: "./cmd/bgpiano-send"
-    binary: "{{ .ProjectName }}_{{ .Target }}/bgpiano-send{{ .Ext }}"
+    binary: "{{ .ProjectName }}_{{ .Target }}/bgpiano-send"
     skip: false
   - <<: *build_template_linux
     id: "bgpiano-recv_linux"
     main: "./cmd/bgpiano-recv"
-    binary: "{{ .ProjectName }}_{{ .Target }}/bgpiano-recv{{ .Ext }}"
+    binary: "{{ .ProjectName }}_{{ .Target }}/bgpiano-recv"
     skip: false
 
 archives:
