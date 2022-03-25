@@ -23,8 +23,9 @@ builds:
       - "amd64"
     env:
       # reference: https://wiki.archlinux.org/title/Arch_package_guidelines/Security
-      - "CGO_CPPFLAGS=-fstack-protector-strong -fstack-clash-protection -D_GLIBCXX_ASSERTION -D_FORTIFY_SOURCE=2"
-      - "CGO_LDFLAGS=-Wl,-z,relro,-z,now,-z,defs,-z,noexecstack -fPIC"
+      - "CGO_CFLAGS=-fstack-protector-strong -fstack-clash-protection -D_GLIBCXX_ASSERTION -D_FORTIFY_SOURCE=2 -flto=auto -ffat-lto-objects"
+      - "CGO_CPPFLAGS=-fstack-protector-strong -fstack-clash-protection -D_GLIBCXX_ASSERTION -D_FORTIFY_SOURCE=2 -flto=auto -ffat-lto-objects"
+      - "CGO_LDFLAGS=-Wl,-z,relro,-z,now,-z,defs,-z,noexecstack -fPIC -flto=auto"
     flags:
       - "-v"
       - "-trimpath"
