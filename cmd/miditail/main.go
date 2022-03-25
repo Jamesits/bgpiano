@@ -63,7 +63,7 @@ func main() {
 	err = rd.ListenTo(in)
 	exception.HardFailWithReason("unable to listen to input port", err)
 
-	log.Println("midicat started")
+	log.Println("miditail started")
 
 	sl := lifecycle.NewSleepLock()
 	lifecycle.WaitForKeyboardInterruptAsync(func() (exitCode int) {

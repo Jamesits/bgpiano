@@ -91,9 +91,9 @@ builds:
     binary: "{{ .ProjectName }}_{{ .Target }}/midils"
     skip: false
   - <<: *build_template_linux
-    id: "midicat"
-    main: "./cmd/midicat"
-    binary: "{{ .ProjectName }}_{{ .Target }}/midicat"
+    id: "miditail"
+    main: "./cmd/miditail"
+    binary: "{{ .ProjectName }}_{{ .Target }}/miditail"
     skip: false
   - <<: *build_template_linux
     id: "midipipe"

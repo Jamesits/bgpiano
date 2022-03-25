@@ -77,9 +77,9 @@ builds:
     binary: "{{ .ProjectName }}_{{ .Target }}/midils"
     skip: false
   - <<: *build_template_windows
-    id: "midicat"
-    main: "./cmd/midicat"
-    binary: "{{ .ProjectName }}_{{ .Target }}/midicat"
+    id: "miditail"
+    main: "./cmd/miditail"
+    binary: "{{ .ProjectName }}_{{ .Target }}/miditail"
     skip: false
   - <<: *build_template_windows
     id: "midipipe"
