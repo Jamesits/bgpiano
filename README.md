@@ -46,7 +46,7 @@ bgpiano-recv --bgp-peer-ip=<reflector-ip>
 
 Go 1.18 or higher is required.
 
-## Linux
+### Linux
 
 Requirements:
 
