@@ -4,7 +4,9 @@ MIDI tunneling through BGP, for times when you want to broadcast your music inst
 
 ## Usage
 
-### Point to Point
+### `bgpiano-send` and `bgpiano-recv`
+
+#### Point to Point (Decentralized)
 
 The GoBGP library we use does not support customizing peer TCP port. Thus, you are stuck with port 179 and would
 (in most cases) need root privilege to listen on that port.
@@ -21,7 +23,7 @@ Synthesizer (MIDI receiver) side:
 sudo bgpiano-recv --bgp-port=179 --bgp-peer-ip=<peer-ip>
 ```
 
-### Reflected
+#### Reflected (Centralized)
 
 Reflector side: `gobgp` or equivalent software required. Any RFC-compliant BGP daemon configured as an RR or RS can be
 used.
@@ -41,6 +43,16 @@ Synthesizer (MIDI receiver) side:
 ```shell
 bgpiano-recv --bgp-peer-ip=<reflector-ip>
 ```
+
+### Utilities
+
+There are some utility programs for debugging your BGP and MIDI sessions. These can run independently
+and helped a lot during the development process.
+
+- `bgpcat`: Connects to a BGP daemon and prints a stream of received routes.
+- `midils`: Lists all the MIDI input and output ports (devices) on your computer.
+- `miditail`: Connects to a MIDI input port and prints a stream of received messaged, both in HEX and decoded form.
+- `midipipe`: Receives MIDI messages from multiple input ports and sends them to multiple output ports.
 
 ## Building
 
