@@ -34,7 +34,6 @@ builds:
       - "-buildmode=pie"
 
       # https://utcc.utoronto.ca/~cks/space/blog/programming/GoVersionOfYourSource
-      - "-buildinfo=false"
       - "-buildvcs=false"
     asmflags:
       - "all=-trimpath={{ .Env.GOPATH }}"
