@@ -32,6 +32,10 @@ builds:
       # https://docs.google.com/document/d/1nr-TQHw_er6GOQRsF6T43GGhFDelrAP0NqSS_00RgZQ/
       # https://rain-1.github.io/golang-aslr.html
       - "-buildmode=pie"
+
+      # https://utcc.utoronto.ca/~cks/space/blog/programming/GoVersionOfYourSource
+      - "-buildinfo=false"
+      - "-buildvcs=false"
     asmflags:
       - "all=-trimpath={{ .Env.GOPATH }}"
     gcflags:
