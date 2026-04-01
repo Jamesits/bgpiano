@@ -3,14 +3,14 @@ module github.com/jamesits/bgpiano
 go 1.24.0
 
 require (
-	github.com/jamesits/libiferr v0.0.0-20220318185358-918bd9502231
-	github.com/mattn/go-colorable v0.1.12
-	github.com/osrg/gobgp/v3 v3.35.0
-	github.com/sirupsen/logrus v1.9.3
-	github.com/spf13/pflag v1.0.5
+	github.com/jamesits/libiferr v0.0.0-20240607124041-3e72b79afd46
+	github.com/mattn/go-colorable v0.1.14
+	github.com/osrg/gobgp/v3 v3.37.0
+	github.com/sirupsen/logrus v1.9.4
+	github.com/spf13/pflag v1.0.10
 	gitlab.com/gomidi/midi v1.23.7
-	gitlab.com/gomidi/rtmididrv v0.14.0
-	google.golang.org/protobuf v1.36.10
+	gitlab.com/gomidi/rtmididrv v0.15.0
+	google.golang.org/protobuf v1.36.11
 )
 
 require (
@@ -22,7 +22,7 @@ require (
 	github.com/hashicorp/hcl v1.0.0 // indirect
 	github.com/k-sone/critbitgo v1.4.0 // indirect
 	github.com/magiconair/properties v1.8.7 // indirect
-	github.com/mattn/go-isatty v0.0.14 // indirect
+	github.com/mattn/go-isatty v0.0.20 // indirect
 	github.com/mitchellh/mapstructure v1.5.0 // indirect
 	github.com/pelletier/go-toml/v2 v2.0.8 // indirect
 	github.com/spf13/afero v1.9.5 // indirect
