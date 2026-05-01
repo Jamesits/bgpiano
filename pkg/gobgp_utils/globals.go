@@ -1,7 +1,7 @@
 package gobgp_utils
 
 import (
-	api "github.com/osrg/gobgp/v3/api"
+	api "github.com/osrg/gobgp/v4/api"
 	"google.golang.org/protobuf/types/known/anypb"
 )
 

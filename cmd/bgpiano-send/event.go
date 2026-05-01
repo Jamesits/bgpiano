@@ -4,7 +4,7 @@ import (
 	"context"
 	"github.com/jamesits/bgpiano/pkg/gobgp_utils"
 	"github.com/jamesits/libiferr/exception"
-	api "github.com/osrg/gobgp/v3/api"
+	api "github.com/osrg/gobgp/v4/api"
 	"gitlab.com/gomidi/midi"
 	"gitlab.com/gomidi/midi/reader"
 	"google.golang.org/protobuf/types/known/anypb"
