@@ -1,6 +1,6 @@
 package gobgp_utils
 
-import api "github.com/osrg/gobgp/v3/api"
+import api "github.com/osrg/gobgp/v4/api"
 
 var V4Family = &api.Family{
 	Afi:  api.Family_AFI_IP,

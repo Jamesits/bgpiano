@@ -3,8 +3,8 @@ package gobgp_utils
 import (
 	"context"
 	"github.com/jamesits/libiferr/exception"
-	api "github.com/osrg/gobgp/v3/api"
-	"github.com/osrg/gobgp/v3/pkg/server"
+	api "github.com/osrg/gobgp/v4/api"
+	"github.com/osrg/gobgp/v4/pkg/server"
 	"github.com/sirupsen/logrus"
 )
 

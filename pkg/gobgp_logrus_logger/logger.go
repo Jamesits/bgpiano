@@ -1,7 +1,7 @@
 package gobgp_logrus_logger
 
 import (
-	"github.com/osrg/gobgp/v3/pkg/log"
+	"github.com/osrg/gobgp/v4/pkg/log"
 	"github.com/sirupsen/logrus"
 )
 

@@ -5,7 +5,7 @@ import (
 	"github.com/jamesits/bgpiano/pkg/bgpiano_protocol"
 	"github.com/jamesits/bgpiano/pkg/midi_messages"
 	"github.com/jamesits/libiferr/exception"
-	api "github.com/osrg/gobgp/v3/api"
+	api "github.com/osrg/gobgp/v4/api"
 	"gitlab.com/gomidi/midi/writer"
 	"google.golang.org/protobuf/proto"
 )

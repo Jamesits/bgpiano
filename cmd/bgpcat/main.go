@@ -7,8 +7,8 @@ import (
 	"github.com/jamesits/bgpiano/pkg/logging_config"
 	"github.com/jamesits/libiferr/exception"
 	"github.com/jamesits/libiferr/lifecycle"
-	api "github.com/osrg/gobgp/v3/api"
-	"github.com/osrg/gobgp/v3/pkg/server"
+	api "github.com/osrg/gobgp/v4/api"
+	"github.com/osrg/gobgp/v4/pkg/server"
 	"github.com/sirupsen/logrus"
 	"time"
 )
