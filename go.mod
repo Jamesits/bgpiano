@@ -8,7 +8,7 @@ require (
 	github.com/osrg/gobgp/v4 v4.5.0
 	github.com/sirupsen/logrus v1.10.0
 	github.com/spf13/pflag v1.0.10
-	gitlab.com/gomidi/midi v1.23.7
+	gitlab.com/gomidi/midi/v2 v2.3.24
 	gitlab.com/gomidi/rtmididrv v0.15.0
 	google.golang.org/protobuf v1.36.12
 )
